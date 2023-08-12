@@ -3,6 +3,10 @@ import logging
 import voluptuous as vol
 
 from homeassistant.const import ATTR_NAME
+from homeassistant.core import (
+    ServiceResponse,
+    SupportsResponse
+)
 import homeassistant.helpers.config_validation as cv
 
 from .const import (
@@ -14,6 +18,7 @@ _LOGGER = logging.getLogger(DOMAIN)
 
 SERVICE_ADD_ITEM = "add_item"
 SERVICE_REMOVE_ITEM = "remove_item"
+SERVICE_GET_ITEMS = "get_items"
 
 SERVICE_ITEM_SCHEMA = vol.Schema({vol.Required(ATTR_NAME): cv.string})
 
@@ -28,11 +33,18 @@ async def async_setup_entry(hass, config_entry):
         name = call.data[ATTR_NAME]
         await anylist.remove_item(name)
 
+    async def get_items_service(call) -> ServiceResponse:
+        _, items = await anylist.get_items()
+        return {"items": items}
+
     hass.services.async_register(
         DOMAIN, SERVICE_ADD_ITEM, add_item_service, schema=SERVICE_ITEM_SCHEMA
     )
     hass.services.async_register(
         DOMAIN, SERVICE_REMOVE_ITEM, remove_item_service, schema=SERVICE_ITEM_SCHEMA
+    )
+    hass.services.async_register(
+        DOMAIN, SERVICE_GET_ITEMS, get_items_service, supports_response=SupportsResponse.ONLY
     )
 
     return True
@@ -60,7 +72,7 @@ class Anylist:
                     body = await response.json()
                     return (code, body["items"])
                 else:
-                    return (code, None)
+                    return (code, [])
 
     def get_server_url(self, endpoint):
         addr = self.config_entry.data[CONF_SERVER_ADDR]
