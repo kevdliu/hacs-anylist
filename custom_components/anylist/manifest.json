@@ -1,0 +1,12 @@
+{
+  "version": "0.0.1",
+  "domain": "anylist",
+  "name": "Anylist",
+  "config_flow": true,
+  "codeowners": ["@kevdliu"],
+  "dependencies": [],
+  "documentation": "https://github.com/kevdliu/hacs-anylist",
+  "issue_tracker": "https://github.com/kevdliu/hacs-anylist/issues",
+  "integration_type": "service",
+  "requirements": []
+}

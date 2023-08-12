@@ -1,0 +1,17 @@
+add_item:
+  description: Add an item to Anylist
+  fields:
+    name:
+      description: Name of the item
+      example: Milk
+      selector:
+        text:
+
+remove_item:
+  description: Remove an item from Anylist
+  fields:
+    name:
+      description: Name of the item
+      example: Milk
+      selector:
+        text:
