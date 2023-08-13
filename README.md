@@ -66,7 +66,20 @@ items:
 ### Home Assistant Intents
 
 #### Assist
-Home Assistant [2023.8.0](https://www.home-assistant.io/blog/2023/08/02/release-20238/) added support for wildcard matching in intents and as a result re-added support for adding items to shopping lists using intents. However, I was not able to get this to work via [Assist](https://www.home-assistant.io/voice_control/) without installing the built-in [Shopping List](https://www.home-assistant.io/integrations/shopping_list/) integration first. So beware that you have to install the built-in Shopping List integration first before installing this integration if you want to use it via Assist. Note that Assist does not support removing items or querying the items on a shopping list yet. 
+Home Assistant [2023.8.0](https://www.home-assistant.io/blog/2023/08/02/release-20238/) added support for wildcard matching in intents and as a result re-added support for adding items to shopping lists using intents. However, the built-in shopping list intents seem to only work with the built-in [Shopping List](https://www.home-assistant.io/integrations/shopping_list/) integration. If you wish to use this integration with [Home Assistant Assist](https://www.home-assistant.io/voice_control/), you have to download and place the `custom_sentences` directory in this repository into the `config` directory of your Home Assistant installation. For more details, see [Adding support for custom sentences](https://www.home-assistant.io/integrations/conversation/#adding-custom-sentences).
+
+
+The `custom_sentences` directory contains a few starter commands allowing you to modify and query your Anylist. For example:
+- Adding an item: `Add {item} to my list`
+- Removing an item: `Remove {item} from my list`
+- Getting items: `What's on my list`
+
+
+Slight sentence variations are supported in order to capture more commands. If you wish to customize the commands yourself, see [Template sentence syntax](https://developers.home-assistant.io/docs/voice/intent-recognition/template-sentence-syntax/).
 
 #### Automation
 Home Assistant 2023.8.0 also introduced support for [wildcards in sentence triggers](https://www.home-assistant.io/blog/2023/08/02/release-20238/#wildcard-support-for-sentence-triggers) for automations. As a result, you can build your own Anylist automation by combining [sentence triggers](https://www.home-assistant.io/docs/automation/trigger/#sentence-trigger) and the service calls provided by this integration to match your own needs. 
+
+
+## Category Matching
+By default, the integration will apply the "Other" category to added items. However, it also attempts to automatically apply categories to your added items by looking up the categories of recently added items stored on your Anylist account. As such, if you fix the category of added items manually, the integration will "learn" over time and apply the correct categories in the future. I guess you can call this machine learning :laughing:
