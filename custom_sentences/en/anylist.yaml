@@ -1,0 +1,25 @@
+language: "en"
+intents:
+  AnylistAddItem:
+    data:
+      - sentences:
+          - "add {item} to <articles> <specifier> list"
+
+  AnylistRemoveItem:
+    data:
+      - sentences:
+          - "remove {item} from <articles> <specifier> list"
+
+  AnylistGetItems:
+    data:
+      - sentences:
+          - "(whats | what's | what is) on <articles> <specifier> list"
+          - "what do i have on <articles> <specifier> list"
+
+lists:
+  item:
+    wildcard: true
+
+expansion_rules:
+  articles: "[the | my]"
+  specifier: "[shopping | any]"
