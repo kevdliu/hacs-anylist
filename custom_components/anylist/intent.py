@@ -24,10 +24,15 @@ class AddItemIntent(intent.IntentHandler):
     async def async_handle(self, intent_obj: intent.Intent):
         slots = self.async_validate_slots(intent_obj.slots)
         item = slots["item"]["value"]
-        await intent_obj.hass.data[DOMAIN].add_item(item)
+        added = await intent_obj.hass.data[DOMAIN].add_item(item)
+
+        if added:
+            speech = "I have added {} to your list.".format(item)
+        else:
+            speech = "An error has occurred while adding the item. Check logs for details."
 
         response = intent_obj.create_response()
-        response.async_set_speech("I have added {} to your list.".format(item))
+        response.async_set_speech(speech)
         return response
 
 class RemoveItemIntent(intent.IntentHandler):
@@ -38,10 +43,15 @@ class RemoveItemIntent(intent.IntentHandler):
     async def async_handle(self, intent_obj: intent.Intent):
         slots = self.async_validate_slots(intent_obj.slots)
         item = slots["item"]["value"]
-        await intent_obj.hass.data[DOMAIN].remove_item(item)
+        removed = await intent_obj.hass.data[DOMAIN].remove_item(item)
+
+        if removed:
+            speech = "I have removed {} from your list.".format(item)
+        else:
+            speech = "An error has occurred while removing the item. Check logs for details."
 
         response = intent_obj.create_response()
-        response.async_set_speech("I have removed {} from your list.".format(item))
+        response.async_set_speech(speech)
         return response
 
 class GetItemsIntent(intent.IntentHandler):
@@ -49,13 +59,17 @@ class GetItemsIntent(intent.IntentHandler):
     intent_type = INTENT_GET_ITEMS
 
     async def async_handle(self, intent_obj: intent.Intent):
-        _, items = await intent_obj.hass.data[DOMAIN].get_items()
+        items = await intent_obj.hass.data[DOMAIN].get_items()
+
+        if items is None:
+            speech = "An error has occurred while getting the items on your list. Check logs for details."
+        elif len(items) == 0:
+            speech = "There are no items on your list."
+        else:
+            speech = "You have: {}.".format(self.format_items(items))
 
         response = intent_obj.create_response()
-        if not items:
-            response.async_set_speech("There are no items on your list.")
-        else:
-            response.async_set_speech("You have: {}.".format(self.format_items(items)))
+        response.async_set_speech(speech)
         return response
 
     def format_items(self, items):

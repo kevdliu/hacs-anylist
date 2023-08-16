@@ -7,5 +7,14 @@
                 }
             }
         }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "data": {
+                    "default_list": "Default List Name"
+                }
+            }
+        }
     }
 }

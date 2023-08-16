@@ -1,17 +1,36 @@
 add_item:
-  description: Add an item to Anylist
+  description: Add an item to the Anylist list
   fields:
     name:
       description: Name of the item
       example: Milk
       selector:
         text:
+    list:
+      description: Name of the list
+      example: Shopping
+      selector:
+        text:
 
 remove_item:
-  description: Remove an item from Anylist
+  description: Remove an item from the Anylist list
   fields:
     name:
       description: Name of the item
       example: Milk
+      selector:
+        text:
+    list:
+      description: Name of the list
+      example: Shopping
+      selector:
+        text:
+
+get_items:
+  description: Gets the list of items that are on the Anylist list
+  fields:
+    list:
+      description: Name of the list
+      example: Shopping
       selector:
         text:
