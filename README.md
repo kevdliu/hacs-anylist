@@ -14,6 +14,7 @@ If you already have HACS installed, you can simply click this button:
 ## Configuration
 The integration will prompt for the address of the [Anylist Home Assistant addon](https://github.com/kevdliu/hassio-addon-anylist) server during setup. The address includes the scheme (currently only plain-text http is supported), hostname or IP, and port of the server. For example, if you're running the addon locally and have it configured to listen on port 1234, the server address would be `http://127.0.0.1:1234`. Please do not include a trailing slash at the end of the address. 
 
+
 ## Usage
 There are two ways to use this integration: service calls and Home Assistant intents. 
 
@@ -26,12 +27,14 @@ Parameters:
 | Parameter | Required | Description          |
 | --------- | -------- | -------------------- |
 | name      | Yes      | The name of the item |
+| list      | No       | The name of the list |
 
 Example service call:
 ```
 service: anylist.add_item
 data:
   name: milk
+  list: Shopping
 ```
 
 
@@ -40,23 +43,30 @@ Parameters:
 | Parameter | Required | Description          |
 | --------- | -------- | -------------------- |
 | name      | Yes      | The name of the item |
+| list      | No       | The name of the list |
 
 Example service call:
 ```
 service: anylist.remove_item
 data:
   name: milk
+  list: Shopping
 ```
 
 
 #### anylist.get_items
-Parameters: None
+Parameters:
+| Parameter | Required | Description          |
+| --------- | -------- | -------------------- |
+| list      | No       | The name of the list |
 
-Response: A dictionary containing the key `items` which contains an array of items on the list
+Response: A dictionary containing the field `items` which contains an array of items on the list
 
 Example service call:
 ```
 service: anylist.get_items
+data:
+  list: Shopping
 ```
 
 Example response:
@@ -108,3 +118,7 @@ Getting items:
 
 ## Category Matching
 By default, the integration will apply the "Other" category to added items. However, it also attempts to automatically apply categories to your added items by looking up the categories of recently added items stored on your Anylist account. As such, if you fix the category of added items manually, the integration will "learn" over time and apply the correct categories in the future. I guess you can call this machine learning :laughing:
+
+
+## Options
+The integration allows you to specify the name of the default Anylist list to use if none are specified in the service call. The default list name is also used for Home Assistant intents.
