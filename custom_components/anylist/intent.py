@@ -24,9 +24,9 @@ class AddItemIntent(intent.IntentHandler):
     async def async_handle(self, intent_obj: intent.Intent):
         slots = self.async_validate_slots(intent_obj.slots)
         item = slots["item"]["value"]
-        added = await intent_obj.hass.data[DOMAIN].add_item(item)
+        code = await intent_obj.hass.data[DOMAIN].add_item(item)
 
-        if added:
+        if code == 200 or code == 304:
             speech = "I have added {} to your list.".format(item)
         else:
             speech = "An error has occurred while adding the item. Check logs for details."
@@ -43,9 +43,9 @@ class RemoveItemIntent(intent.IntentHandler):
     async def async_handle(self, intent_obj: intent.Intent):
         slots = self.async_validate_slots(intent_obj.slots)
         item = slots["item"]["value"]
-        removed = await intent_obj.hass.data[DOMAIN].remove_item(item)
+        code = await intent_obj.hass.data[DOMAIN].remove_item_by_name(item)
 
-        if removed:
+        if code == 200 or code == 304:
             speech = "I have removed {} from your list.".format(item)
         else:
             speech = "An error has occurred while removing the item. Check logs for details."
@@ -59,9 +59,9 @@ class GetItemsIntent(intent.IntentHandler):
     intent_type = INTENT_GET_ITEMS
 
     async def async_handle(self, intent_obj: intent.Intent):
-        items = await intent_obj.hass.data[DOMAIN].get_items()
+        code, items = await intent_obj.hass.data[DOMAIN].get_items()
 
-        if items is None:
+        if code != 200:
             speech = "An error has occurred while getting the items on your list. Check logs for details."
         elif len(items) == 0:
             speech = "There are no items on your list."
