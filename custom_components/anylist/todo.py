@@ -30,8 +30,8 @@ class AnylistTodoListEntity(CoordinatorEntity[AnylistUpdateCoordinator], TodoLis
 
     def __init__(self, hass, coordinator, list_name):
         super().__init__(coordinator)
-        self._attr_name = f"Anylist {list_name.capitalize()}"
-        self._attr_unique_id = f"anylist_{list_name}"
+        self._attr_name = list_name
+        self._attr_unique_id = list_name
         self.list_name = list_name
         self.hass = hass
 
