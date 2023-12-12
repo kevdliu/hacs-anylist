@@ -16,10 +16,10 @@ The integration will prompt for the address of the [Anylist Home Assistant addon
 
 
 ## Usage
-There are two ways to use this integration: service calls and Home Assistant intents. 
+There are three ways to use this integration: service calls, [Home Assistant To-do lists](https://www.home-assistant.io/integrations/todo/), and Home Assistant intents. 
 
 ### Service Calls
-The integration has three services: `anylist.add_item`, `anylist.remove_item`, and `anylist.get_items`.
+The integration has five services: `anylist.add_item`, `anylist.remove_item`, `anylist.check_item`, `anylist.uncheck_item`, and `anylist.get_items`.
 
 
 #### anylist.add_item
@@ -54,6 +54,38 @@ data:
 ```
 
 
+#### anylist.check_item
+Parameters:
+| Parameter | Required | Description          |
+| --------- | -------- | -------------------- |
+| name      | Yes      | The name of the item |
+| list      | No       | The name of the list |
+
+Example service call:
+```
+service: anylist.check_item
+data:
+  name: milk
+  list: Shopping
+```
+
+
+#### anylist.uncheck_item
+Parameters:
+| Parameter | Required | Description          |
+| --------- | -------- | -------------------- |
+| name      | Yes      | The name of the item |
+| list      | No       | The name of the list |
+
+Example service call:
+```
+service: anylist.uncheck_item
+data:
+  name: milk
+  list: Shopping
+```
+
+
 #### anylist.get_items
 Parameters:
 | Parameter | Required | Description          |
@@ -76,6 +108,10 @@ items:
   - Flour
   - [Your kiss](https://www.youtube.com/watch?v=lsHld-iArOc)
   - Eggs
+
+
+### Home Assistant To-do Lists
+The integration supports the to-do lists feature introduced in [Home Assistant 2023.11.0](https://www.home-assistant.io/blog/2023/11/01/release-202311). The to-do list feature enables displaying and managing Anylist lists in the Home Assistant UI. See [the release notes](https://www.home-assistant.io/blog/2023/11/01/release-202311/#there-is-a-lot-to-do) for more details. A corresponding `todo` entity will be created by the integration for each available Anylist list.
 
 
 ### Home Assistant Intents
