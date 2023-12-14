@@ -1,17 +1,31 @@
 import aiohttp
 import logging
-import voluptuous as vol
+import os
+import stat
+import subprocess
 
-from homeassistant.const import ATTR_NAME, Platform
+from threading import Thread
+
+from homeassistant.const import (
+    ATTR_NAME,
+    EVENT_HOMEASSISTANT_STOP,
+    Platform,
+)
 from homeassistant.core import (
     ServiceResponse,
     SupportsResponse
 )
+from homeassistant.exceptions import HomeAssistantError
+
+import voluptuous as vol
 import homeassistant.helpers.config_validation as cv
 
 from .const import (
     DOMAIN,
     CONF_SERVER_ADDR,
+    CONF_EMAIL,
+    CONF_PASSWORD,
+    CONF_SERVER_BINARY,
     CONF_DEFAULT_LIST
 )
 
@@ -27,6 +41,8 @@ SERVICE_GET_ITEMS = "get_items"
 
 ATTR_LIST = "list"
 
+BINARY_SERVER_PORT = "28597"
+
 SERVICE_ITEM_SCHEMA = vol.Schema(
     {
         vol.Required(ATTR_NAME): cv.string,
@@ -39,6 +55,40 @@ SERVICE_LIST_SCHEMA = vol.Schema(
         vol.Optional(ATTR_LIST, default = ""): cv.string
     }
 )
+
+def start_server(hass, config_entry):
+    binary = config_entry.data.get(CONF_SERVER_BINARY)
+    email = config_entry.data.get(CONF_EMAIL)
+    password = config_entry.data.get(CONF_PASSWORD)
+
+    if binary is None or email is None or password is None:
+        return None
+
+    if not os.path.isfile(binary):
+        raise HomeAssistantError("Failed to locate server binary")
+
+    if not os.access(binary, os.X_OK):
+        _LOGGER.debug("Fixing server binary permissions")
+        os.chmod(binary, os.stat(binary).st_mode | stat.S_IEXEC)
+
+    if not os.access(binary, os.X_OK):
+        raise HomeAssistantError("Failed to fix server binary permissions")
+
+    credentials_file = hass.config.path(".anylist_credentials")
+    server = AnylistServer(
+        [
+            binary,
+            "--port", BINARY_SERVER_PORT,
+            "--email", email,
+            "--password", password,
+            "--credentials-file", credentials_file,
+            "--ip-filter", "127.0.0.1"
+        ]
+    )
+    server.start()
+
+    hass.bus.async_listen_once(EVENT_HOMEASSISTANT_STOP, server.stop)
+    return server
 
 async def async_setup_entry(hass, config_entry):
     anylist = hass.data[DOMAIN] = Anylist(config_entry)
@@ -93,11 +143,24 @@ async def async_setup_entry(hass, config_entry):
         schema = SERVICE_LIST_SCHEMA, supports_response = SupportsResponse.ONLY
     )
 
+    server = start_server(hass, config_entry)
+    if server:
+        anylist.binary_server = server
+        _LOGGER.info("Server binary successfully started")
+
     await hass.config_entries.async_forward_entry_setups(config_entry, PLATFORMS)
 
     return True
 
+async def async_unload_entry(hass, config_entry):
+    server = hass.data[DOMAIN].binary_server
+    if isinstance(server, AnylistServer):
+        server.stop()
+    return True
+
 class Anylist:
+
+    binary_server = None
 
     def __init__(self, config_entry):
         self.config_entry = config_entry
@@ -212,9 +275,53 @@ class Anylist:
                     _LOGGER.error("Failed to get lists. Received error code %d.", code)
                     return (code, [])
 
+    def get_server_address(self):
+        addr = self.config_entry.data.get(CONF_SERVER_ADDR)
+        if addr is not None:
+            return addr
+
+        if self.binary_server is not None and self.binary_server.available:
+            return "http://127.0.0.1:{}".format(BINARY_SERVER_PORT)
+
+        raise HomeAssistantError("Binary server is not running")
+
     def get_server_url(self, endpoint):
-        addr = self.config_entry.data[CONF_SERVER_ADDR]
+        addr = self.get_server_address()
         return "{}/{}".format(addr, endpoint)
 
     def get_list_name(self, list_name):
         return list_name or self.config_entry.options.get(CONF_DEFAULT_LIST)
+
+class AnylistServer(Thread):
+
+    def __init__(self, args):
+        super().__init__(name = DOMAIN, daemon = True)
+        self.args = args
+        self.process = None
+
+    @property
+    def available(self):
+        return self.process.poll() is None if self.process else False
+
+    def run(self):
+        self.process = subprocess.Popen(
+            self.args,
+            stdout = subprocess.PIPE,
+            stderr = subprocess.STDOUT
+        )
+
+        while self.process.poll() is None:
+            line = self.process.stdout.readline()
+            if line == b"":
+                break
+            _LOGGER.info(line[:-1].decode())
+
+        code = self.process.poll()
+        if code > 0:
+            _LOGGER.error("Binary server exited with error code: {}".format(code))
+
+        self.process = None
+
+    def stop(self, *args):
+        if self.process is not None:
+            self.process.terminate()

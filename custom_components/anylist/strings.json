@@ -2,18 +2,49 @@
   "config": {
     "step": {
       "user": {
+        "title": "Server Installation",
+        "description": "Select Anylist server installation method"
+      },
+      "addon": {
+        "title": "Addon Server",
+        "description": "Make sure the Anylist addon is installed and properly configured",
         "data": {
-          "server_addr": "Anylist Server URL"
+          "server_addr": "Addon Server URL"
+        },
+        "data_description": {
+          "server_addr": "Full fledged URL including scheme and port (Example: http://192.168.1.2:89453)"
+        }
+      },
+      "binary": {
+        "title": "Binary Server",
+        "description": "The server binary can be downloaded from https://github.com/kevdliu/hassio-addon-anylist/releases",
+        "data": {
+          "server_binary": "Server Binary Location",
+          "email": "Email",
+          "password": "Password"
+        },
+        "data_description": {
+          "server_binary": "Server binary file path (Example: /config/anylist_server)",
+          "email": "Anylist account email",
+          "password": "Anylist account password"
         }
       }
+    },
+    "error": {
+      "addon_server_cannot_connect": "Failed to connect to addon server",
+      "server_binary_not_found": "Failed to locate server binary",
+      "server_binary_wrong_permissions": "Failed to fix server binary permissions"
     }
   },
   "options": {
     "step": {
       "init": {
-          "data": {
-            "default_list": "Default List Name"
-          }
+        "data": {
+          "default_list": "Default List Name"
+        },
+        "data_description": {
+          "default_list": "Default list is used when list name is otherwise not specified"
+        }
       }
     }
   }
