@@ -7,7 +7,13 @@ from homeassistant.components.todo import (
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .coordinator import AnylistUpdateCoordinator
-from .const import DOMAIN
+from .const import (
+    DOMAIN,
+    ATTR_ID,
+    ATTR_NAME,
+    ATTR_CHECKED,
+    ATTR_NOTES
+)
 
 async def async_setup_entry(hass, config_entry, async_add_entities):
     code, lists = await hass.data[DOMAIN].get_lists()
@@ -26,12 +32,14 @@ class AnylistTodoListEntity(CoordinatorEntity[AnylistUpdateCoordinator], TodoLis
         TodoListEntityFeature.CREATE_TODO_ITEM
         | TodoListEntityFeature.DELETE_TODO_ITEM
         | TodoListEntityFeature.UPDATE_TODO_ITEM
+        | TodoListEntityFeature.SET_DESCRIPTION_ON_ITEM
     )
 
     def __init__(self, hass, coordinator, list_name):
         super().__init__(coordinator)
         self._attr_name = f"Anylist {list_name}"
         self._attr_unique_id = f"anylist_{list_name}"
+        self._attr_extra_state_attributes = {"source_name": f"\"{list_name}\""}
         self.list_name = list_name
         self.hass = hass
 
@@ -42,16 +50,22 @@ class AnylistTodoListEntity(CoordinatorEntity[AnylistUpdateCoordinator], TodoLis
 
         items = [
             TodoItem(
-                summary = item["name"],
-                uid = item["id"],
-                status = TodoItemStatus.COMPLETED if item["checked"] else TodoItemStatus.NEEDS_ACTION
+                summary = item[ATTR_NAME],
+                uid = item[ATTR_ID],
+                status = TodoItemStatus.COMPLETED if item[ATTR_CHECKED] else TodoItemStatus.NEEDS_ACTION,
+                description = item[ATTR_NOTES]
             )
             for item in self.coordinator.data
         ]
         return items
 
     async def async_create_todo_item(self, item):
-        await self.hass.data[DOMAIN].add_item(item.summary, list_name = self.list_name)
+        updates = self.get_item_updates(item)
+        await self.hass.data[DOMAIN].add_item(
+            item.summary,
+            updates = updates,
+            list_name = self.list_name
+        )
         await self.coordinator.async_refresh()
 
     async def async_delete_todo_items(self, uids):
@@ -60,14 +74,22 @@ class AnylistTodoListEntity(CoordinatorEntity[AnylistUpdateCoordinator], TodoLis
         await self.coordinator.async_refresh()
 
     async def async_update_todo_item(self, item):
-        checked = None
-        if item.status is not None:
-            checked = (item.status == TodoItemStatus.COMPLETED)
-
+        updates = self.get_item_updates(item)
         await self.hass.data[DOMAIN].update_item(
             item.uid,
-            list_name = self.list_name,
-            name = item.summary,
-            checked = checked
+            updates = updates,
+            list_name = self.list_name
         )
         await self.coordinator.async_refresh()
+
+    def get_item_updates(self, item):
+        updates = dict()
+        updates[ATTR_NAME] = item.summary
+
+        if item.description is not None:
+            updates[ATTR_NOTES] = item.description
+
+        if item.status is not None:
+            updates[ATTR_CHECKED] = (item.status == TodoItemStatus.COMPLETED)
+
+        return updates

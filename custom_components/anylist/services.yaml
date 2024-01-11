@@ -11,6 +11,11 @@ add_item:
       example: Shopping
       selector:
         text:
+    notes:
+      description: Notes for the item
+      example: Skim Milk
+      selector:
+        text:
 
 remove_item:
   description: Remove an item from the Anylist list
@@ -29,6 +34,34 @@ remove_item:
 get_items:
   description: Gets the list of items that are on the Anylist list
   fields:
+    list:
+      description: Name of the list
+      example: Shopping
+      selector:
+        text:
+
+check_item:
+  description: Check an item from the Anylist list
+  fields:
+    name:
+      description: Name of the item
+      example: Milk
+      selector:
+        text:
+    list:
+      description: Name of the list
+      example: Shopping
+      selector:
+        text:
+
+uncheck_item:
+  description: Uncheck an item from the Anylist list
+  fields:
+    name:
+      description: Name of the item
+      example: Milk
+      selector:
+        text:
     list:
       description: Name of the list
       example: Shopping

@@ -7,7 +7,6 @@ import subprocess
 from threading import Thread
 
 from homeassistant.const import (
-    ATTR_NAME,
     EVENT_HOMEASSISTANT_STOP,
     Platform,
 )
@@ -26,7 +25,12 @@ from .const import (
     CONF_EMAIL,
     CONF_PASSWORD,
     CONF_SERVER_BINARY,
-    CONF_DEFAULT_LIST
+    CONF_DEFAULT_LIST,
+    ATTR_ID,
+    ATTR_NAME,
+    ATTR_LIST,
+    ATTR_CHECKED,
+    ATTR_NOTES
 )
 
 PLATFORMS: list[Platform] = [Platform.TODO]
@@ -39,13 +43,12 @@ SERVICE_CHECK_ITEM = "check_item"
 SERVICE_UNCHECK_ITEM = "uncheck_item"
 SERVICE_GET_ITEMS = "get_items"
 
-ATTR_LIST = "list"
-
 BINARY_SERVER_PORT = "28597"
 
 SERVICE_ITEM_SCHEMA = vol.Schema(
     {
         vol.Required(ATTR_NAME): cv.string,
+        vol.Optional(ATTR_NOTES, default = ""): cv.string,
         vol.Optional(ATTR_LIST, default = ""): cv.string
     }
 )
@@ -96,7 +99,7 @@ async def async_setup_entry(hass, config_entry):
     async def add_item_service(call):
         item_name = call.data[ATTR_NAME]
         list_name = call.data.get(ATTR_LIST)
-        code = await anylist.add_item(item_name, list_name)
+        code = await anylist.add_item(item_name, updates = call.data, list_name = list_name)
         return {"code": code}
 
     async def remove_item_service(call):
@@ -165,11 +168,27 @@ class Anylist:
     def __init__(self, config_entry):
         self.config_entry = config_entry
 
-    async def add_item(self, item_name, list_name = None):
+    def populate_item_updates(self, item, updates):
+        if updates is None:
+            return
+
+        if ATTR_NAME in updates:
+            item[ATTR_NAME] = updates[ATTR_NAME]
+
+        if ATTR_CHECKED in updates:
+            item[ATTR_CHECKED] = updates[ATTR_CHECKED]
+
+        if ATTR_NOTES in updates:
+            item[ATTR_NOTES] = updates[ATTR_NOTES]
+
+    async def add_item(self, item_name, updates = None, list_name = None):
         body = {
-            "name": item_name.capitalize(),
-            "list": self.get_list_name(list_name)
+            ATTR_NAME: item_name.capitalize(),
+            ATTR_LIST: self.get_list_name(list_name)
         }
+
+        self.populate_item_updates(body, updates)
+        body[ATTR_CHECKED] = False
 
         async with aiohttp.ClientSession() as session:
             async with session.post(self.get_server_url("add"), json = body) as response:
@@ -180,8 +199,8 @@ class Anylist:
 
     async def remove_item_by_name(self, item_name, list_name = None):
         body = {
-            "name": item_name.capitalize(),
-            "list": self.get_list_name(list_name)
+            ATTR_NAME: item_name,
+            ATTR_LIST: self.get_list_name(list_name)
         }
 
         async with aiohttp.ClientSession() as session:
@@ -193,8 +212,8 @@ class Anylist:
 
     async def remove_item_by_id(self, item_id, list_name = None):
         body = {
-            "id": item_id,
-            "list": self.get_list_name(list_name)
+            ATTR_ID: item_id,
+            ATTR_LIST: self.get_list_name(list_name)
         }
 
         async with aiohttp.ClientSession() as session:
@@ -204,17 +223,13 @@ class Anylist:
                     _LOGGER.error("Failed to remove item. Received error code %d.", code)
                 return code
 
-    async def update_item(self, item_id, list_name = None, name = None, checked = None):
+    async def update_item(self, item_id, updates, list_name = None):
         body = {
-            "id": item_id,
-            "list": self.get_list_name(list_name)
+            ATTR_ID: item_id,
+            ATTR_LIST: self.get_list_name(list_name)
         }
 
-        if name is not None:
-            body["name"] = name
-
-        if checked is not None:
-            body["checked"] = checked
+        self.populate_item_updates(body, updates)
 
         async with aiohttp.ClientSession() as session:
             async with session.post(self.get_server_url("update"), json = body) as response:
@@ -225,9 +240,9 @@ class Anylist:
 
     async def check_item(self, item_name, list_name = None, checked = True):
         body = {
-            "name": item_name.capitalize(),
-            "list": self.get_list_name(list_name),
-            "checked": checked
+            ATTR_NAME: item_name,
+            ATTR_LIST: self.get_list_name(list_name),
+            ATTR_CHECKED: checked
         }
 
         async with aiohttp.ClientSession() as session:
@@ -240,7 +255,7 @@ class Anylist:
     async def get_detailed_items(self, list_name = None):
         if name := self.get_list_name(list_name):
             query = {
-                "list": name
+                ATTR_LIST: name
             }
         else:
             query = None
@@ -258,8 +273,8 @@ class Anylist:
     async def get_items(self, list_name = None):
         code, items = await self.get_detailed_items(list_name)
         if code == 200:
-            items = list(filter(lambda item: not item["checked"], items))
-            items = list(map(lambda item: item["name"], items))
+            items = list(filter(lambda item: not item[ATTR_CHECKED], items))
+            items = list(map(lambda item: item[ATTR_NAME], items))
             return (code, items)
         else:
             return (code, [])
