@@ -39,7 +39,6 @@ class AnylistTodoListEntity(CoordinatorEntity[AnylistUpdateCoordinator], TodoLis
         super().__init__(coordinator)
         self._attr_name = f"Anylist {list_name}"
         self._attr_unique_id = f"anylist_{list_name}"
-        self._attr_extra_state_attributes = {"source_name": f"\"{list_name}\""}
         self.list_name = list_name
         self.hass = hass
 
@@ -93,3 +92,11 @@ class AnylistTodoListEntity(CoordinatorEntity[AnylistUpdateCoordinator], TodoLis
             updates[ATTR_CHECKED] = (item.status == TodoItemStatus.COMPLETED)
 
         return updates
+
+    @property
+    def extra_state_attributes(self):
+        return {
+            "source_name": f"{self.list_name}",
+            "checked_items": [item[ATTR_NAME] for item in self.coordinator.data if item[ATTR_CHECKED]],
+            "unchecked_items": [item[ATTR_NAME] for item in self.coordinator.data if not item[ATTR_CHECKED]]
+        }
