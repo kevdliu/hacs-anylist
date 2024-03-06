@@ -27,6 +27,7 @@ Parameters:
 | Parameter | Required | Description          |
 | --------- | -------- | -------------------- |
 | name      | Yes      | The name of the item |
+| notes     | No       | Notes for the item   |
 | list      | No       | The name of the list |
 
 Example service call:
@@ -34,6 +35,7 @@ Example service call:
 service: anylist.add_item
 data:
   name: milk
+  notes: Skim milk
   list: Shopping
 ```
 
@@ -117,7 +119,11 @@ The integration supports the to-do lists feature introduced in [Home Assistant 2
 ### Home Assistant Intents
 
 #### Assist
-Home Assistant [2023.8.0](https://www.home-assistant.io/blog/2023/08/02/release-20238/) added support for wildcard matching in intents and as a result re-added support for adding items to shopping lists using intents. However, the built-in shopping list intents seem to only work with the built-in [Shopping List](https://www.home-assistant.io/integrations/shopping_list/) integration. If you wish to use this integration with [Home Assistant Assist](https://www.home-assistant.io/voice_control/), you have to download and place the `custom_sentences` directory in this repository into the `config` directory of your Home Assistant installation. For more details, see [Adding support for custom sentences](https://www.home-assistant.io/integrations/conversation/#adding-custom-sentences).
+If you wish to use this integration with [Home Assistant Assist](https://www.home-assistant.io/voice_control/), Home Assistant 2023.12.0 added support for adding items to to-do lists using intents. For more details, see [built-in intents](https://developers.home-assistant.io/docs/intent_builtin/) and [the intents repository](https://github.com/home-assistant/intents).
+
+
+However, the built-in intents are very limited in functionality. It currently only supports adding items to lists. For the ability to remove and query items, custom sentences need to be added. 
+To add custom sentences, download and place the `custom_sentences` directory in this repository into the `config` directory of your Home Assistant installation. For more details, see [Adding support for custom sentences](https://www.home-assistant.io/integrations/conversation/#adding-custom-sentences).
 
 
 The `custom_sentences` directory contains a few starter commands allowing you to modify and query your Anylist. For example:
@@ -129,7 +135,7 @@ The `custom_sentences` directory contains a few starter commands allowing you to
 Slight sentence variations are supported in order to capture more commands. If you wish to customize the commands yourself, see [Template sentence syntax](https://developers.home-assistant.io/docs/voice/intent-recognition/template-sentence-syntax/).
 
 #### Automation
-Home Assistant 2023.8.0 also introduced support for [wildcards in sentence triggers](https://www.home-assistant.io/blog/2023/08/02/release-20238/#wildcard-support-for-sentence-triggers) for automations. As a result, you can build your own Anylist automation by combining [sentence triggers](https://www.home-assistant.io/docs/automation/trigger/#sentence-trigger) and the service calls provided by this integration to match your own needs. 
+Home Assistant 2023.8.0 introduced support for [wildcards in sentence triggers](https://www.home-assistant.io/blog/2023/08/02/release-20238/#wildcard-support-for-sentence-triggers) for automations. As a result, you can build your own Anylist automation by combining [sentence triggers](https://www.home-assistant.io/docs/automation/trigger/#sentence-trigger) and the service calls provided by this integration to match your own needs. 
 
 If you wish, you can also import these pre-built blueprints into your Home Assistant to get started quickly. 
 
