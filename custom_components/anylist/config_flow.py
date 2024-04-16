@@ -6,6 +6,9 @@ from homeassistant import config_entries
 
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.selector import (
+    NumberSelector,
+    NumberSelectorConfig,
+    NumberSelectorMode,
     TextSelector,
     TextSelectorConfig,
     TextSelectorType
@@ -20,14 +23,21 @@ from .const import (
     CONF_EMAIL,
     CONF_PASSWORD,
     CONF_SERVER_BINARY,
-    CONF_DEFAULT_LIST
+    CONF_DEFAULT_LIST,
+    CONF_REFRESH_INTERVAL
 )
 
 _LOGGER = logging.getLogger(DOMAIN)
 
 STEP_ADDON_DATA_SCHEMA = vol.Schema(
     {
-        vol.Required(CONF_SERVER_ADDR): str
+        vol.Required(
+            CONF_SERVER_ADDR
+        ): TextSelector(
+            TextSelectorConfig(
+                type = TextSelectorType.URL
+            )
+        )
     }
 )
 
@@ -61,7 +71,26 @@ STEP_BINARY_DATA_SCHEMA = vol.Schema(
 
 STEP_INIT_DATA_SCHEMA = vol.Schema(
     {
-        vol.Optional(CONF_DEFAULT_LIST, default = ""): str
+        vol.Optional(
+            CONF_DEFAULT_LIST,
+            default = ""
+        ): TextSelector(
+            TextSelectorConfig(
+                type = TextSelectorType.TEXT
+            )
+        ),
+        vol.Optional(
+            CONF_REFRESH_INTERVAL,
+            default = 30,
+        ): NumberSelector(
+            NumberSelectorConfig(
+                min = 15,
+                max = 120,
+                step = 15,
+                unit_of_measurement = "minutes",
+                mode = NumberSelectorMode.SLIDER
+            )
+        )
     }
 )
 
@@ -72,6 +101,15 @@ class ConfigFlow(config_entries.ConfigFlow, domain = DOMAIN):
     async def async_step_user(self, user_input):
         return self.async_show_menu(
             step_id = "user",
+            menu_options = {
+                "addon": "Addon Server (Recommended)",
+                "binary": "Binary Server (Experimental)"
+            }
+        )
+
+    async def async_step_reconfigure(self, user_input):
+        return self.async_show_menu(
+            step_id = "reconfigure",
             menu_options = {
                 "addon": "Addon Server (Recommended)",
                 "binary": "Binary Server (Experimental)"

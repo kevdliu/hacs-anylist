@@ -12,13 +12,16 @@ from .const import (
     ATTR_ID,
     ATTR_NAME,
     ATTR_CHECKED,
-    ATTR_NOTES
+    ATTR_NOTES,
+    CONF_REFRESH_INTERVAL
 )
 
 async def async_setup_entry(hass, config_entry, async_add_entities):
+    refresh_interval = config_entry.options.get(CONF_REFRESH_INTERVAL, 30)
+
     code, lists = await hass.data[DOMAIN].get_lists()
     for list_name in lists:
-        coordinator = AnylistUpdateCoordinator(hass, list_name)
+        coordinator = AnylistUpdateCoordinator(hass, list_name, refresh_interval)
         await coordinator.async_config_entry_first_refresh()
 
         async_add_entities(

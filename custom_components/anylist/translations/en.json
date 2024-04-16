@@ -5,6 +5,10 @@
           "title": "Server Installation",
           "description": "Select Anylist server installation method"
         },
+        "reconfigure": {
+          "title": "Server Installation",
+          "description": "Modify Anylist server installation method"
+        },
         "addon": {
           "title": "Addon Server",
           "description": "Make sure the Anylist addon is installed and properly configured",
@@ -40,10 +44,12 @@
       "step": {
         "init": {
           "data": {
-            "default_list": "Default List Name"
+            "default_list": "Default List Name",
+            "refresh_interval": "Refresh Interval"
           },
           "data_description": {
-            "default_list": "Default list is used when list name is otherwise not specified"
+            "default_list": "Default list is used when list name is otherwise not specified",
+            "refresh_interval": "How often lists should be refreshed from Anylist"
           }
         }
       }

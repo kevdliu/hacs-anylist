@@ -7,6 +7,7 @@ CONF_PASSWORD = "password"
 CONF_SERVER_BINARY = "server_binary"
 
 CONF_DEFAULT_LIST = "default_list"
+CONF_REFRESH_INTERVAL = "refresh_interval"
 
 ATTR_ID = "id"
 ATTR_NAME = "name"

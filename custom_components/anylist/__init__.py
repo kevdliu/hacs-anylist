@@ -305,7 +305,7 @@ class Anylist:
         return "{}/{}".format(addr, endpoint)
 
     def get_list_name(self, list_name):
-        return list_name or self.config_entry.options.get(CONF_DEFAULT_LIST)
+        return list_name or self.config_entry.options.get(CONF_DEFAULT_LIST, "")
 
 class AnylistServer(Thread):
 

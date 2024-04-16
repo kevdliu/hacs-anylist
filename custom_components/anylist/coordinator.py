@@ -7,12 +7,10 @@ from .const import DOMAIN
 
 _LOGGER = logging.getLogger(DOMAIN)
 
-UPDATE_INTERVAL = datetime.timedelta(minutes = 30)
-
 class AnylistUpdateCoordinator(DataUpdateCoordinator):
 
-    def __init__(self, hass, list_name):
-        super().__init__(hass, _LOGGER, name = f"Anylist {list_name}", update_interval = UPDATE_INTERVAL)
+    def __init__(self, hass, list_name, refresh_interval):
+        super().__init__(hass, _LOGGER, name = f"Anylist {list_name}", update_interval = datetime.timedelta(minutes = refresh_interval))
         self.list_name = list_name
         self.hass = hass
 
