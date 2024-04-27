@@ -159,7 +159,11 @@ async def async_unload_entry(hass, config_entry):
     server = hass.data[DOMAIN].binary_server
     if isinstance(server, AnylistServer):
         server.stop()
-    return True
+
+    if unload_ok := await hass.config_entries.async_unload_platforms(config_entry, PLATFORMS):
+        hass.data.pop(DOMAIN)
+
+    return unload_ok
 
 class Anylist:
 
