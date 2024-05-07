@@ -11,6 +11,12 @@ If you already have HACS installed, you can simply click this button:
 
 [![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=kevdliu&repository=hacs-anylist&category=integration)
 
+## Add Integration
+After installing the custom integration, you have to add the integration to Home Assistant. You may do so manually by going to the Settings -> Devices & Services -> Integrations page in Home Assistant, or by clicking the button:
+
+
+[![Open your Home Assistant instance and start setting up a new integration.](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=anylist)
+
 ## Configuration
 The integration will prompt for the address of the [Anylist Home Assistant addon](https://github.com/kevdliu/hassio-addon-anylist) server during setup. The address includes the scheme (currently only plain-text http is supported), hostname or IP, and port of the server. For example, if you're running the addon locally and have it configured to listen on port 1234, the server address would be `http://127.0.0.1:1234`. Please do not include a trailing slash at the end of the address. 
 
