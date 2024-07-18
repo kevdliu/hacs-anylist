@@ -177,7 +177,7 @@ class Anylist:
             return
 
         if ATTR_NAME in updates:
-            item[ATTR_NAME] = updates[ATTR_NAME]
+            item[ATTR_NAME] = updates[ATTR_NAME].strip().capitalize()
 
         if ATTR_CHECKED in updates:
             item[ATTR_CHECKED] = updates[ATTR_CHECKED]
@@ -187,7 +187,7 @@ class Anylist:
 
     async def add_item(self, item_name, updates = None, list_name = None):
         body = {
-            ATTR_NAME: item_name.capitalize(),
+            ATTR_NAME: item_name.strip().capitalize(),
             ATTR_LIST: self.get_list_name(list_name)
         }
 
@@ -203,7 +203,7 @@ class Anylist:
 
     async def remove_item_by_name(self, item_name, list_name = None):
         body = {
-            ATTR_NAME: item_name,
+            ATTR_NAME: item_name.strip(),
             ATTR_LIST: self.get_list_name(list_name)
         }
 
@@ -244,7 +244,7 @@ class Anylist:
 
     async def check_item(self, item_name, list_name = None, checked = True):
         body = {
-            ATTR_NAME: item_name,
+            ATTR_NAME: item_name.strip(),
             ATTR_LIST: self.get_list_name(list_name),
             ATTR_CHECKED: checked
         }
