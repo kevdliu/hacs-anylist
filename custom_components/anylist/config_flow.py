@@ -124,7 +124,12 @@ class ConfigFlow(config_entries.ConfigFlow, domain = DOMAIN):
                 errors[CONF_SERVER_ADDR] = "addon_server_cannot_connect"
 
             if not errors:
-                return self.async_create_entry(title = "Anylist", data = user_input)
+                if self.source == config_entries.SOURCE_RECONFIGURE:
+                    return self.async_update_reload_and_abort(
+                        entry = self._get_reconfigure_entry(), data = user_input
+                    )
+                else:
+                    return self.async_create_entry(title = "Anylist", data = user_input)
 
         return self.async_show_form(
             step_id = "addon",
@@ -148,7 +153,12 @@ class ConfigFlow(config_entries.ConfigFlow, domain = DOMAIN):
                 errors[CONF_SERVER_BINARY] = error
 
             if not errors:
-                return self.async_create_entry(title = "Anylist", data = user_input)
+                if self.source == config_entries.SOURCE_RECONFIGURE:
+                    return self.async_update_reload_and_abort(
+                        entry = self._get_reconfigure_entry(), data = user_input
+                    )
+                else:
+                    return self.async_create_entry(title = "Anylist", data = user_input)
 
         return self.async_show_form(
             step_id = "binary",

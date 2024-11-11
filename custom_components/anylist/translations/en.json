@@ -38,6 +38,9 @@
         "addon_server_cannot_connect": "Failed to connect to addon server",
         "server_binary_not_found": "Failed to locate server binary",
         "server_binary_wrong_permissions": "Failed to fix server binary permissions"
+      },
+      "abort": {
+        "reconfigure_successful": "Anylist successfully reconfigured"
       }
     },
     "options": {
