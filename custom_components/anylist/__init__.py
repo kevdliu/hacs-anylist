@@ -30,7 +30,8 @@ from .const import (
     ATTR_NAME,
     ATTR_LIST,
     ATTR_CHECKED,
-    ATTR_NOTES
+    ATTR_NOTES,
+    ATTR_INCLUDE_CHECKED
 )
 
 PLATFORMS: list[Platform] = [Platform.TODO]
@@ -55,7 +56,8 @@ SERVICE_ITEM_SCHEMA = vol.Schema(
 
 SERVICE_LIST_SCHEMA = vol.Schema(
     {
-        vol.Optional(ATTR_LIST, default = ""): cv.string
+        vol.Optional(ATTR_LIST, default = ""): cv.string,
+        vol.Optional(ATTR_INCLUDE_CHECKED, default = False): cv.boolean
     }
 )
 
@@ -122,7 +124,8 @@ async def async_setup_entry(hass, config_entry):
 
     async def get_items_service(call) -> ServiceResponse:
         list_name = call.data.get(ATTR_LIST)
-        code, items = await anylist.get_items(list_name)
+        include_checked = call.data.get(ATTR_INCLUDE_CHECKED, False)
+        code, items = await anylist.get_items(include_checked, list_name)
         return {"code": code, "items": items}
 
     hass.services.async_register(
@@ -274,10 +277,11 @@ class Anylist:
                     _LOGGER.error("Failed to get items. Received error code %d.", code)
                     return (code, [])
 
-    async def get_items(self, list_name = None):
+    async def get_items(self, include_checked = False, list_name = None):
         code, items = await self.get_detailed_items(list_name)
         if code == 200:
-            items = list(filter(lambda item: not item[ATTR_CHECKED], items))
+            if not include_checked:
+                items = list(filter(lambda item: not item[ATTR_CHECKED], items))
             items = list(map(lambda item: item[ATTR_NAME], items))
             return (code, items)
         else:

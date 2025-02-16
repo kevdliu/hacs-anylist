@@ -39,6 +39,10 @@ get_items:
       example: Shopping
       selector:
         text:
+    include_checked:
+      description: Include checked / completed items
+      selector:
+        boolean:
 
 check_item:
   description: Check an item from the Anylist list
