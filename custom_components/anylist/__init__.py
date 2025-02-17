@@ -125,8 +125,11 @@ async def async_setup_entry(hass, config_entry):
     async def get_items_service(call) -> ServiceResponse:
         list_name = call.data.get(ATTR_LIST)
         include_checked = call.data.get(ATTR_INCLUDE_CHECKED, False)
-        code, items = await anylist.get_items(include_checked, list_name)
-        return {"code": code, "items": items}
+        (code, (unchecked_items, checked_items)) = await anylist.get_items(list_name)
+        if include_checked:
+            return {"code": code, "items": unchecked_items, "checkedItems": checked_items}
+        else:
+            return {"code": code, "items": unchecked_items}
 
     hass.services.async_register(
         DOMAIN, SERVICE_ADD_ITEM, add_item_service,
@@ -277,15 +280,18 @@ class Anylist:
                     _LOGGER.error("Failed to get items. Received error code %d.", code)
                     return (code, [])
 
-    async def get_items(self, include_checked = False, list_name = None):
+    async def get_items(self, list_name = None):
         code, items = await self.get_detailed_items(list_name)
         if code == 200:
-            if not include_checked:
-                items = list(filter(lambda item: not item[ATTR_CHECKED], items))
-            items = list(map(lambda item: item[ATTR_NAME], items))
-            return (code, items)
+            unchecked_items = list(filter(lambda item: not item[ATTR_CHECKED], items))
+            unchecked_items = list(map(lambda item: item[ATTR_NAME], unchecked_items))
+
+            checked_items = list(filter(lambda item: item[ATTR_CHECKED], items))
+            checked_items = list(map(lambda item: item[ATTR_NAME], checked_items))
+
+            return (code, (unchecked_items, checked_items))
         else:
-            return (code, [])
+            return (code, ([], []))
 
     async def get_lists(self):
         async with aiohttp.ClientSession() as session:
