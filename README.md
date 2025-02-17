@@ -96,17 +96,20 @@ data:
 
 #### anylist.get_items
 Parameters:
-| Parameter | Required | Description          |
-| --------- | -------- | -------------------- |
-| list      | No       | The name of the list |
+| Parameter       | Required | Description                                      |
+| --------------- | -------- | ------------------------------------------------ |
+| list            | No       | The name of the list                             |
+| include_checked | No       | Whether to include checked items in the response |
 
-Response: A dictionary containing the field `items` which contains an array of items on the list
+Response: A dictionary containing the field `items` which contains an array of items on the list.
+If the parameter `include_checked` is set to true, an additional field `checkedItems` will be included which contains an array of checked / completed items on the list.
 
 Example service call:
 ```
 service: anylist.get_items
 data:
   list: Shopping
+  include_checked: true
 ```
 
 Example response:
@@ -116,6 +119,10 @@ items:
   - Flour
   - [Your kiss](https://www.youtube.com/watch?v=lsHld-iArOc)
   - Eggs
+
+checkedItems:
+  - Yogurt
+  - Bread
 
 
 ### Home Assistant To-do Lists
