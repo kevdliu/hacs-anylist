@@ -25,7 +25,7 @@ The integration will prompt for the address of the [Anylist Home Assistant addon
 There are three ways to use this integration: service calls, [Home Assistant To-do lists](https://www.home-assistant.io/integrations/todo/), and Home Assistant intents. 
 
 ### Service Calls
-The integration has five services: `anylist.add_item`, `anylist.remove_item`, `anylist.check_item`, `anylist.uncheck_item`, and `anylist.get_items`.
+The integration has six services: `anylist.add_item`, `anylist.remove_item`, `anylist.check_item`, `anylist.uncheck_item`, `anylist.get_items`, and `anylist.get_all_items`.
 
 
 #### anylist.add_item
@@ -96,25 +96,46 @@ data:
 
 #### anylist.get_items
 Parameters:
-| Parameter       | Required | Description                                      |
-| --------------- | -------- | ------------------------------------------------ |
-| list            | No       | The name of the list                             |
-| include_checked | No       | Whether to include checked items in the response |
+| Parameter | Required | Description          |
+| --------- | -------- | -------------------- |
+| list      | No       | The name of the list |
 
-Response: A dictionary containing the field `items` which contains an array of items on the list.
-If the parameter `include_checked` is set to true, an additional field `checkedItems` will be included which contains an array of checked / completed items on the list.
+Response: A dictionary containing the field `items` which contains an array of unchecked items on the list.
 
 Example service call:
 ```
 service: anylist.get_items
 data:
   list: Shopping
-  include_checked: true
 ```
 
 Example response:
 
 items:
+  - Milk
+  - Flour
+  - [Your kiss](https://www.youtube.com/watch?v=lsHld-iArOc)
+  - Eggs
+
+
+#### anylist.get_all_items
+Parameters:
+| Parameter | Required | Description          |
+| --------- | -------- | -------------------- |
+| list      | No       | The name of the list |
+
+Response: A dictionary containing the field `uncheckedItems` which contains an array of unchecked items on the list and an additional field `checkedItems` which contains an array of checked / completed items on the list.
+
+Example service call:
+```
+service: anylist.get_all_items
+data:
+  list: Shopping
+```
+
+Example response:
+
+uncheckedItems:
   - Milk
   - Flour
   - [Your kiss](https://www.youtube.com/watch?v=lsHld-iArOc)
