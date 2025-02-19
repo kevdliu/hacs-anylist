@@ -30,8 +30,7 @@ from .const import (
     ATTR_NAME,
     ATTR_LIST,
     ATTR_CHECKED,
-    ATTR_NOTES,
-    ATTR_INCLUDE_CHECKED
+    ATTR_NOTES
 )
 
 PLATFORMS: list[Platform] = [Platform.TODO]
@@ -43,6 +42,7 @@ SERVICE_REMOVE_ITEM = "remove_item"
 SERVICE_CHECK_ITEM = "check_item"
 SERVICE_UNCHECK_ITEM = "uncheck_item"
 SERVICE_GET_ITEMS = "get_items"
+SERVICE_GET_ALL_ITEMS = "get_all_items"
 
 BINARY_SERVER_PORT = "28597"
 
@@ -56,8 +56,7 @@ SERVICE_ITEM_SCHEMA = vol.Schema(
 
 SERVICE_LIST_SCHEMA = vol.Schema(
     {
-        vol.Optional(ATTR_LIST, default = ""): cv.string,
-        vol.Optional(ATTR_INCLUDE_CHECKED, default = False): cv.boolean
+        vol.Optional(ATTR_LIST, default = ""): cv.string
     }
 )
 
@@ -124,12 +123,13 @@ async def async_setup_entry(hass, config_entry):
 
     async def get_items_service(call) -> ServiceResponse:
         list_name = call.data.get(ATTR_LIST)
-        include_checked = call.data.get(ATTR_INCLUDE_CHECKED, False)
-        (code, (unchecked_items, checked_items)) = await anylist.get_items(list_name)
-        if include_checked:
-            return {"code": code, "items": unchecked_items, "checkedItems": checked_items}
-        else:
-            return {"code": code, "items": unchecked_items}
+        (code, items) = await anylist.get_items(list_name)
+        return {"code": code, "items": items}
+
+    async def get_all_items_service(call) -> ServiceResponse:
+        list_name = call.data.get(ATTR_LIST)
+        (code, (unchecked_items, checked_items)) = await anylist.get_all_items(list_name)
+        return {"code": code, "uncheckedItems": unchecked_items, "checkedItems": checked_items}
 
     hass.services.async_register(
         DOMAIN, SERVICE_ADD_ITEM, add_item_service,
@@ -149,6 +149,10 @@ async def async_setup_entry(hass, config_entry):
     )
     hass.services.async_register(
         DOMAIN, SERVICE_GET_ITEMS, get_items_service,
+        schema = SERVICE_LIST_SCHEMA, supports_response = SupportsResponse.ONLY
+    )
+    hass.services.async_register(
+        DOMAIN, SERVICE_GET_ALL_ITEMS, get_all_items_service,
         schema = SERVICE_LIST_SCHEMA, supports_response = SupportsResponse.ONLY
     )
 
@@ -281,6 +285,15 @@ class Anylist:
                     return (code, [])
 
     async def get_items(self, list_name = None):
+        code, items = await self.get_detailed_items(list_name)
+        if code == 200:
+            items = list(filter(lambda item: not item[ATTR_CHECKED], items))
+            items = list(map(lambda item: item[ATTR_NAME], items))
+            return (code, items)
+        else:
+            return (code, [])
+
+    async def get_all_items(self, list_name = None):
         code, items = await self.get_detailed_items(list_name)
         if code == 200:
             unchecked_items = list(filter(lambda item: not item[ATTR_CHECKED], items))

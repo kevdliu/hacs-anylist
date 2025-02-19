@@ -32,17 +32,22 @@ remove_item:
         text:
 
 get_items:
-  description: Gets the list of items that are on the Anylist list
+  description: Gets the list of unchecked items that are on the Anylist list
   fields:
     list:
       description: Name of the list
       example: Shopping
       selector:
         text:
-    include_checked:
-      description: Include checked / completed items
+
+get_all_items:
+  description: Gets the list of unchecked items and also checked / completed items that are on the Anylist list
+  fields:
+    list:
+      description: Name of the list
+      example: Shopping
       selector:
-        boolean:
+        text:
 
 check_item:
   description: Check an item from the Anylist list
