@@ -21,7 +21,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
 
     code, lists = await hass.data[DOMAIN].get_lists()
     for list_name in lists:
-        coordinator = AnylistUpdateCoordinator(hass, list_name, refresh_interval)
+        coordinator = AnylistUpdateCoordinator(hass, config_entry, list_name, refresh_interval)
         await coordinator.async_config_entry_first_refresh()
 
         async_add_entities(

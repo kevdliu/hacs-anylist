@@ -9,8 +9,8 @@ _LOGGER = logging.getLogger(DOMAIN)
 
 class AnylistUpdateCoordinator(DataUpdateCoordinator):
 
-    def __init__(self, hass, list_name, refresh_interval):
-        super().__init__(hass, _LOGGER, name = f"Anylist {list_name}", update_interval = datetime.timedelta(minutes = refresh_interval))
+    def __init__(self, hass, config_entry, list_name, refresh_interval):
+        super().__init__(hass, _LOGGER, config_entry = config_entry, name = f"Anylist {list_name}", update_interval = datetime.timedelta(minutes = refresh_interval))
         self.list_name = list_name
         self.hass = hass
 
