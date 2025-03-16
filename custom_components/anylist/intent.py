@@ -43,7 +43,7 @@ class RemoveItemIntent(intent.IntentHandler):
     async def async_handle(self, intent_obj: intent.Intent):
         slots = self.async_validate_slots(intent_obj.slots)
         item = slots["item"]["value"]
-        code = await intent_obj.hass.data[DOMAIN].remove_item_by_name(item)
+        code = await intent_obj.hass.data[DOMAIN].remove_item_by_name(item.capitalize())
 
         if code == 200 or code == 304:
             speech = "I have removed {} from your list.".format(item)
