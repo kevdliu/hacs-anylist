@@ -213,7 +213,7 @@ class Anylist:
 
     async def remove_item_by_name(self, item_name, list_name = None):
         body = {
-            ATTR_NAME: item_name.strip(),
+            ATTR_NAME: item_name.strip().capitalize(),
             ATTR_LIST: self.get_list_name(list_name)
         }
 
@@ -254,7 +254,7 @@ class Anylist:
 
     async def check_item(self, item_name, list_name = None, checked = True):
         body = {
-            ATTR_NAME: item_name.strip(),
+            ATTR_NAME: item_name.strip().capitalize(),
             ATTR_LIST: self.get_list_name(list_name),
             ATTR_CHECKED: checked
         }
