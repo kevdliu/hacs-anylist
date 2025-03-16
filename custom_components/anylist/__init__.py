@@ -133,19 +133,19 @@ async def async_setup_entry(hass, config_entry):
 
     hass.services.async_register(
         DOMAIN, SERVICE_ADD_ITEM, add_item_service,
-        schema = SERVICE_ITEM_SCHEMA, supports_response = SupportsResponse.ONLY
+        schema = SERVICE_ITEM_SCHEMA, supports_response = SupportsResponse.OPTIONAL
     )
     hass.services.async_register(
         DOMAIN, SERVICE_REMOVE_ITEM, remove_item_service,
-        schema = SERVICE_ITEM_SCHEMA, supports_response = SupportsResponse.ONLY
+        schema = SERVICE_ITEM_SCHEMA, supports_response = SupportsResponse.OPTIONAL
     )
     hass.services.async_register(
         DOMAIN, SERVICE_CHECK_ITEM, check_item_service,
-        schema = SERVICE_ITEM_SCHEMA, supports_response = SupportsResponse.ONLY
+        schema = SERVICE_ITEM_SCHEMA, supports_response = SupportsResponse.OPTIONAL
     )
     hass.services.async_register(
         DOMAIN, SERVICE_UNCHECK_ITEM, uncheck_item_service,
-        schema = SERVICE_ITEM_SCHEMA, supports_response = SupportsResponse.ONLY
+        schema = SERVICE_ITEM_SCHEMA, supports_response = SupportsResponse.OPTIONAL
     )
     hass.services.async_register(
         DOMAIN, SERVICE_GET_ITEMS, get_items_service,
