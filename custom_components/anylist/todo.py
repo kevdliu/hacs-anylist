@@ -86,10 +86,8 @@ class AnylistTodoListEntity(CoordinatorEntity[AnylistUpdateCoordinator], TodoLis
 
     def get_item_updates(self, item):
         updates = dict()
-        updates[ATTR_NAME] = item.summary
-
-        if item.description is not None:
-            updates[ATTR_NOTES] = item.description
+        updates[ATTR_NAME] = item.summary or ""
+        updates[ATTR_NOTES] = item.description or ""
 
         if item.status is not None:
             updates[ATTR_CHECKED] = (item.status == TodoItemStatus.COMPLETED)
