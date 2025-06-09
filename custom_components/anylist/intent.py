@@ -24,7 +24,7 @@ class AddItemIntent(intent.IntentHandler):
     async def async_handle(self, intent_obj: intent.Intent):
         slots = self.async_validate_slots(intent_obj.slots)
         item = slots["item"]["value"]
-        code = await intent_obj.hass.data[DOMAIN].add_item(item)
+        code = await intent_obj.hass.data[DOMAIN].add_item(item.capitalize())
 
         if code == 200 or code == 304:
             speech = "I have added {} to your list.".format(item)
