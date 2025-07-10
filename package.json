@@ -1,0 +1,31 @@
+{
+  "name": "hacs-anylist",
+  "version": "1.5.9",
+  "description": "TypeScript type definitions for AnyList Home Assistant integration",
+  "main": "types/index.ts",
+  "types": "types/index.ts",
+  "scripts": {
+    "build": "tsc",
+    "lint": "eslint . --ext .ts",
+    "type-check": "tsc --noEmit"
+  },
+  "keywords": [
+    "anylist",
+    "home-assistant",
+    "typescript",
+    "hacs"
+  ],
+  "author": "AnyList HACS Integration",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@typescript-eslint/parser": "^6.21.0",
+    "eslint": "^8.0.0",
+    "typescript": "^5.0.0"
+  },
+  "files": [
+    "types/**/*.ts",
+    "types/**/*.d.ts"
+  ]
+}
