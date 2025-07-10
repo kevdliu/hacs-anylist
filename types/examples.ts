@@ -10,7 +10,6 @@ import {
   AnyListOptions,
   ListItem,
   Recipe,
-  Ingredient,
   NutritionalInfo,
   RecipeCollection,
   
@@ -167,16 +166,16 @@ class AnyListIntegration {
     this.eventEmitter.emit('item:added', customEvent);
   }
   
-  private handleListRefreshed(event: any): void {
+  private handleListRefreshed(event: { listName: string; items: ListItem[] }): void {
     console.log(`List "${event.listName}" refreshed with ${event.items.length} items`);
   }
   
-  private handleApiError(event: any): void {
+  private handleApiError(event: { endpoint: string; error: { message: string } }): void {
     console.error(`API Error on ${event.endpoint}: ${event.error.message}`);
   }
   
   // Example service call using constants
-  async addItem(itemName: string, listName?: string): Promise<void> {
+  async addItem(): Promise<void> {
     console.log(`Calling service: ${SERVICES.ADD_ITEM}`);
     // Implementation would go here
   }
