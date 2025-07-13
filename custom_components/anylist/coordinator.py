@@ -55,6 +55,7 @@ class AnyListData:
     mealplan_coordinator: AnyListMealplanCoordinator
     shoppinglist_coordinator: AnyListShoppingListCoordinator
     statistics_coordinator: AnyListStatisticsCoordinator
+    recipe_coordinator: AnyListRecipeCoordinator
 
 
 type AnyListConfigEntry = ConfigEntry[AnyListData]
@@ -91,52 +92,31 @@ class AnyListDataUpdateCoordinator[_DataT](DataUpdateCoordinator[_DataT]):
                     self.base_url = base_url
                     self.api_key = api_key
                     self.session = ClientSession()
-            
-                async def async_get_recipes(self) -> dict[str, list[Recipe]]:
-                    """Fetch recipes from AnyList."""
-                    url = f"{self.base_url}/recipes"
-                    headers = {
+                    self.headers = {
                         "Authorization": f"Bearer {self.api_key}",
                         "Content-Type": "application/json",
-                    }
+                    }                    
             
-                    try:
-                        async with self.session.get(url, headers=headers) as response:
-                            if response.status == 401:
-                                raise AnyListAuthenticationError("Invalid API key or token.")
-                            elif response.status != 200:
-                                raise AnyListConnectionError(f"Failed to fetch recipes: {response.status}")
-            
-                            data = await response.json()
-                            # Parse the response into the expected format
-                            return self._parse_recipes(data)
-            
-                    except Exception as error:
-                        raise AnyListConnectionError(f"Error fetching recipes: {error}") from error
-            
-                def _parse_recipes(self, data: dict) -> dict[str, list[Recipe]]:
-                    """Parse the API response into the expected format."""
-                    recipes = {}
-                    for recipe in data.get("recipes", []):
-                        category = recipe.get("category", "Uncategorized")
-                        if category not in recipes:
-                            recipes[category] = []
-                        recipes[category].append(Recipe(**recipe))
-                    return recipes
-        except AnyListAuthenticationError as error:
-            raise ConfigEntryAuthFailed(
-                translation_domain=DOMAIN,
-                translation_key="auth_failed",
-            ) from error
-        except AnyListConnectionError as error:
-            raise UpdateFailed(
-                translation_domain=DOMAIN,
-                translation_key=f"update_failed_{self._name}",
-            ) from error
+                async def get_recipes(self) -> dict[str, list[Recipe]]:
+        """Fetch recipes from AnyList."""
+        url = f"{self.base_url}/recipes"
 
-    @abstractmethod
-    async def _async_update_internal(self) -> _DataT:
-        """Fetch data from AnyList."""
+        try:
+            async with self.session.get(url, headers=self.headers) as response:
+                if response.status == 401:
+                    raise AnyListAuthenticationError("Invalid API key or token.")
+                elif response.status != 200:
+                    raise AnyListConnectionError(f"Failed to fetch recipes: {response.status}")
+
+                data = await response.json()
+                # Parse the response into the expected format
+                return self._parse_recipes(data)
+
+        except Exception as error:
+            raise AnyListConnectionError(f"Error fetching recipes: {error}") from error
+  from aiohttp import ClientSession
+                from .exceptions import AnyListAuthenticationError, AnyListConnectionError
+
 
 
 class AnyListMealplanCoordinator(

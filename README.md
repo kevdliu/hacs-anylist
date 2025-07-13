@@ -9,7 +9,7 @@ You can install this custom integration using [HACS](https://hacs.xyz/). It is n
 If you already have HACS installed, you can simply click this button:
 
 
-[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=kevdliu&repository=hacs-anylist&category=integration)
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=tdorsey&repository=hacs-anylist&category=integration)
 
 ## Add Integration
 After installing the custom integration, you have to add the integration to Home Assistant. You may do so manually by going to the Settings -> Devices & Services -> Integrations page in Home Assistant, or by clicking the button:
