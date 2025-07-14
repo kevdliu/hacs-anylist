@@ -1,12 +1,13 @@
 {
-  "version": "1.5.9",
   "domain": "anylist",
-  "name": "Anylist",
+  "name": "anylist",
+  "codeowners": ["@tdorsey"],
   "config_flow": true,
-  "codeowners": ["@kevdliu"],
   "dependencies": [],
-  "documentation": "https://github.com/kevdliu/hacs-anylist",
-  "issue_tracker": "https://github.com/kevdliu/hacs-anylist/issues",
+  "documentation": "https://github.com/tdorsey/hacs-anylist",
   "integration_type": "service",
-  "requirements": []
+  "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/tdorsey/hacs-anylist/issues",
+  "requirements": [],
+  "version": "1.0.0"
 }

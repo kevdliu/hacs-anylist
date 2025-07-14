@@ -1,4 +1,8 @@
+import logging
+
 DOMAIN = "anylist"
+
+LOGGER = logging.getLogger(__name__)
 
 CONF_SERVER_ADDR = "server_addr"
 

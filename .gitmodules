@@ -1,0 +1,3 @@
+[submodule "@home-assistant/core/files/homeassistant/components/mealie"]
+	path = @home-assistant/core/files/homeassistant/components/mealie
+	url = https://github.com/home-assistant/core.git
