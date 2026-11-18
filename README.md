@@ -1,3 +1,6 @@
+# This integration has been deprecated. Please use the official Anylist integration added in Home Assistant 2026.11.
+
+
 # Home Assistant Integration For Anylist
 
 ## Prerequisites
